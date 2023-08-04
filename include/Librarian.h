@@ -5,24 +5,111 @@
 #include <vector>
 using namespace std;
 int fx = 1;
+    // Define a struct for a book node
+    struct Book {
+      string serial;
+      string bookname;
+      string author;
+      string publishdate;
+      Book* next; // pointer to the next book in the list
+    };
 
-  void addBooks() {
-    string serial, bookname, author, publishdate;
-    cout << "Enter the following details: " << endl;
-    cout << "BOOK SERIAL: ";
-    cin >> serial;
-    cout << "BOOKNAME";
-    cin >> bookname;
-    cout << "AUTHOR";
-    cin >> author;
-    cout << "PUBLISH DATE(DD MM YYYY): ";
-    cin >> publishdate;
-    fstream file;
-    file.open("/Users/AN20449220/Desktop/Library-Management/csv/data.csv",
-              std::ios::out | std::ios::app);
-    file << serial << "," << bookname << "," << author << "," << publishdate
-         << "\n";
-  }
+    // Define a class for a linked list of books
+    class BookList {
+      private:
+        Book* head; // pointer to the first book in the list
+        Book* tail; // pointer to the last book in the list
+      public:
+        // Constructor to initialize an empty list
+        BookList() {
+          head = NULL;
+          tail = NULL;
+        }
+
+        // Destructor to free the memory of the list
+        ~BookList() {
+          Book* current = head;
+          while (current != NULL) {
+            Book* next = current->next;
+            delete current;
+            current = next;
+          }
+        }
+
+        // Method to add a new book at the end of the list
+        void addBook(string serial, string bookname, string author, string publishdate) {
+          // Create a new book node with the given data
+          Book* newBook = new Book();
+          newBook->serial = serial;
+          newBook->bookname = bookname;
+          newBook->author = author;
+          newBook->publishdate = publishdate;
+          newBook->next = NULL;
+
+          // If the list is empty, make the new book the head and tail
+          if (head == NULL) {
+            head = newBook;
+            tail = newBook;
+          }
+          // Else, append the new book after the tail and update the tail
+          else {
+            tail->next = newBook;
+            tail = newBook;
+          }
+        }
+
+        // Method to write the list to a file
+        void writeToFile(string filename) {
+          // Open the file in append mode
+          fstream file;
+          file.open(filename, std::ios::out | std::ios::app);
+
+          // Traverse the list and write each book's data to the file
+          Book* current = head;
+          while (current != NULL) {
+            file << current->serial << "," << current->bookname << "," << current->author << "," << current->publishdate << "\n";
+            current = current->next;
+          }
+
+          // Close the file
+          file.close();
+        }
+    };
+
+    // Rewrite the addBooks function using the BookList class
+    void addBooks() {
+      string serial, bookname, author, publishdate;
+
+      // Create an object of BookList class
+      BookList books;
+
+      cout << "Enter the following details: " << endl;
+
+      // Loop until the user enters 'q' to quit
+      while (true) {
+        cout << "BOOK SERIAL (enter 'q' to quit): ";
+        cin >> serial;
+
+        // Break out of the loop if 'q' is entered
+        if (serial == "q") break;
+
+        cout << "BOOKNAME: ";
+        cin >> bookname;
+
+        cout << "AUTHOR: ";
+        cin >> author;
+
+        cout << "PUBLISH DATE(DD MM YYYY): ";
+        cin >> publishdate;
+
+        // Add a new book to the list with the given data
+        books.addBook(serial, bookname, author, publishdate);
+      }
+
+      // Write the list to the file
+      books.writeToFile("/Users/AN20449220/Desktop/Library-Management/csv/data.csv");
+    }
+
 void libraryLogin() {
 
   string userid, password;
