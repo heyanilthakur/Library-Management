@@ -15,9 +15,9 @@ int main() {
     cin >> choice;
     switch (choice) {
     case 1:
-      libraryLogin();
+      LibraryLogin();
       flag = 0;
-      break;
+      break;  
 
     case 2:
       system("exit");
