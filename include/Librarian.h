@@ -1,7 +1,8 @@
+#include <cstdlib>
 #include <fstream>
-#include<sstream>
 #include <iostream>
 #include <list>
+#include <sstream>
 #include <string>
 using namespace std;
 
@@ -56,9 +57,29 @@ public:
     // Close the file
     file.close();
   }
+  void modifyBook(string serial, string bookname = "", string author = "",
+                  string publishdate = "") {
+    // Find the book with the given serial number
+    for (auto &book : books) {
+      if (book.serial == serial) {
+        // Modify the book's data if new data is provided
+        if (!bookname.empty()) {
+          book.bookname = bookname;
+        }
+        if (!author.empty()) {
+          book.author = author;
+        }
+        if (!publishdate.empty()) {
+          book.publishdate = publishdate;
+        }
+        break;
+      }
+    }
+  }
 };
 
-// Function to prompt the user to enter details of books, add them to a BookList object, and write it to a CSV file
+// Function to prompt the user to enter details of books, add them to a BookList
+// object, and write it to a CSV file
 void addBooks(BookList &books) {
   string serial, bookname, author, publishdate;
 
@@ -85,10 +106,12 @@ void addBooks(BookList &books) {
     // Add a new book to the list with the given data
     books.addBook(serial, bookname, author, publishdate);
   }
-  books.writeToFile("/Users/AN20449220/Desktop/Library-Management/csv/data.csv");
+  books.writeToFile(
+      "/Users/AN20449220/Desktop/Library-Management/csv/data.csv");
 }
 
-// Function to prompt the user to enter the serial number of a book and delete it from a BookList object
+// Function to prompt the user to enter the serial number of a book and delete
+// it from a BookList object
 void deleteBook(BookList &books) {
   string serial;
 
@@ -99,74 +122,93 @@ void deleteBook(BookList &books) {
 
   // Delete the book with the given serial number from the list
   books.deleteBook(serial);
-  books.writeToFile("/Users/AN20449220/Desktop/Library-Management/csv/data.csv");
-
+  books.writeToFile(
+      "/Users/AN20449220/Desktop/Library-Management/csv/data.csv");
 }
+void modifyBooks(BookList &books) {
+  std::string serial, bookname, author, publishdate;
 
+  std::cout << "Enter the following details: " << std::endl;
+
+  std::cout << "BOOK SERIAL: ";
+  getline(std::cin, serial);
+
+  std::cout << "NEW BOOK NAME: ";
+  getline(std::cin, bookname);
+
+  std::cout << "NEW AUTHOR NAME: ";
+  getline(std::cin, author);
+
+  std::cout << "NEW PUBLISH DATE: ";
+  getline(std::cin, publishdate);
+
+  // Modify the book with the given serial number in the list
+  books.modifyBook(serial, bookname, author, publishdate);
+  books.writeToFile(
+      "/Users/AN20449220/Desktop/Library-Management/csv/data.csv");
+}
 
 void LibraryLogin() {
   // Create an object of BookList class
-string userid,password,domain;
-cout<<"Enter Your Name: ";
-cin>>userid;
-cout<<"Enter your Password: ";
-cin>>password;
+  string userid, password, domain;
+  cout << "Enter Your Name: ";
+  cin >> userid;
+  cout << "Enter your Password: ";
+  cin >> password;
 
-fstream data;
-string details,word,l;
-vector<string> users;
-data.open("/Users/AN20449220/Desktop/Library-Management/csv/login.csv", ios::in);
-int count=0;
-while(getline(data,l))
-{
+  fstream data;
+  string details, word, l;
+  vector<string> users;
+  data.open("/Users/AN20449220/Desktop/Library-Management/csv/login.csv",
+            ios::in);
+  int count = 0;
+  while (getline(data, l)) {
     count++;
-}
-data.close();
-data.open("/Users/AN20449220/Desktop/Library-Management/csv/login.csv", ios::in);
+  }
+  data.close();
+  data.open("/Users/AN20449220/Desktop/Library-Management/csv/login.csv",
+            ios::in);
 
-for(int i=0; i<=count; i++)
-{
-    getline(data,details);
+  for (int i = 0; i <= count; i++) {
+    getline(data, details);
     stringstream s(details);
-    while (getline(s, word, ','))
-    {
-        users.push_back(word);
+    while (getline(s, word, ',')) {
+      users.push_back(word);
     }
-}
+  }
 
-int length = users.size();
-int i=0;
-int flag=0;
-while(i<length)
-{
-    if(userid == users[i] && password == users[i+1])
-    {
-        flag=1;
+  int length = users.size();
+  int i = 0;
+  int flag = 0;
+  while (i < length) {
+    if (userid == users[i] && password == users[i + 1]) {
+      flag = 1;
     }
-    i = i+3;
-}
-if(flag==1)
-{
-  BookList books;
+    i = i + 3;
+  }
+  if (flag == 1) {
+    BookList books;
 
-  int choice;
-  do {
-    cout << "-----------------LIBRARY MANAGEMENT-------------------" << endl;
-    cout << "|                  Select An Option :                  |"
-         << endl;
-    cout << "|               1. Add Books from Library :            |"
-         << endl;
-    cout << "|               2. Delete Books from Library :         |"
-         << endl;
-    cout << "|               3. Exit :                              |"
-         << endl;
-    cout << "-------------------------------------------------------" << endl;
+    int choice;
+    do {
+      cout << "-----------------LIBRARY MANAGEMENT-------------------" << endl;
+      cout << "|                  Select An Option :                  |"
+           << endl;
+      cout << "|               1. Add Books from Library :            |"
+           << endl;
+      cout << "|               2. Delete Books from Library :         |"
+           << endl;
+      cout << "|               3. Modify Books from Library :         |"
+           << endl;
+      cout << "|               4. Exit :                              |"
+           << endl;
+      cout << "-------------------------------------------------------" << endl;
 
-    cout << "Enter your choice: ";
-    cin >> choice;
-    cin.ignore();
+      cout << "Enter your choice: ";
+      cin >> choice;
+      cin.ignore();
 
-    switch (choice) {
+      switch (choice) {
       case 1:
         addBooks(books);
         break;
@@ -176,14 +218,17 @@ if(flag==1)
         break;
 
       case 3:
+        modifyBooks(books);
+        break;
+
+      case 4:
         exit(0);
         break;
 
       default:
         cout << "Invalid Choice! Try Again." << endl;
         break;
-    }
-  } while (choice != 3);
-
-}
+      }
+    } while (choice != 3);
+  }
 }
