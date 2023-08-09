@@ -1,82 +1,77 @@
-#include <cstdlib>
+#include "LibrarianDef.h" // Include the header file that defines the Librarian class and its methods
+#include "date.h" // Include the header file that defines the Date class and its methods
 #include <fstream>
 #include <iostream>
 #include <list>
-#include <sstream>
 #include <string>
 using namespace std;
+// Method to add a new book at the end of the list
+void BookList::addBook(string serial, string bookname, string author,
+                       string publishdate) {
+  // Create a new book with the given data
+  if (isValidDate(publishdate)) {
 
-// Define a struct for a book
-struct Book {
-  string serial;
-  string bookname;
-  string author;
-  string publishdate;
-};
-
-// Define a class for a list of books using STL list
-class BookList {
-private:
-  list<Book> books; // STL list of books
-
-public:
-  // Method to add a new book at the end of the list
-  void addBook(string serial, string bookname, string author,
-               string publishdate) {
-    // Create a new book with the given data
     Book newBook = {serial, bookname, author, publishdate};
 
     // Add the new book to the end of the list
     books.push_back(newBook);
+  } else {
+    cout << "Invalid publish date: " << publishdate << "\n";
+  }
+}
+
+// Method to delete a book from the list based on its serial number
+void BookList::deleteBook(string serial) {
+  // Find the book with the given serial number
+  for (auto it = books.begin(); it != books.end(); ++it) {
+    if (it->serial == serial) {
+      // Delete the book from the list
+      books.erase(it);
+      break;
+    }
+  }
+}
+
+// Method to write the list to a file
+void BookList::writeToFile(string filename) {
+  // Open the file in append mode
+  fstream file;
+  file.open(filename, std::ios::out);
+
+  // Traverse the list and write each book's data to the file
+  for (const Book &book : books) {
+    file << book.serial << "," << book.bookname << "," << book.author << ","
+         << book.publishdate << "\n";
   }
 
-  // Method to delete a book from the list based on its serial number
-  void deleteBook(string serial) {
-    // Find the book with the given serial number
-    for (auto it = books.begin(); it != books.end(); ++it) {
-      if (it->serial == serial) {
-        // Delete the book from the list
-        books.erase(it);
-        break;
+  // Close the file
+  file.close();
+}
+void BookList::modifyBook(string serial, string bookname, string author,
+                          string publishdate) {
+  // Find the book with the given serial number
+  for (auto &book : books) {
+    if (book.serial == serial) {
+      // Modify the book's data if new data is provided
+      if (!bookname.empty()) {
+        book.bookname = bookname;
       }
-    }
-  }
-
-  // Method to write the list to a file
-  void writeToFile(string filename) {
-    // Open the file in append mode
-    fstream file;
-    file.open(filename, std::ios::out);
-
-    // Traverse the list and write each book's data to the file
-    for (const Book &book : books) {
-      file << book.serial << "," << book.bookname << "," << book.author << ","
-           << book.publishdate << "\n";
-    }
-
-    // Close the file
-    file.close();
-  }
-  void modifyBook(string serial, string bookname = "", string author = "",
-                  string publishdate = "") {
-    // Find the book with the given serial number
-    for (auto &book : books) {
-      if (book.serial == serial) {
-        // Modify the book's data if new data is provided
-        if (!bookname.empty()) {
-          book.bookname = bookname;
-        }
-        if (!author.empty()) {
-          book.author = author;
-        }
-        if (!publishdate.empty()) {
+      if (!author.empty()) {
+        book.author = author;
+      }
+      if (!publishdate.empty()) {
+        // Check if the publishdate is valid
+        if (isValidDate(publishdate)) {
           book.publishdate = publishdate;
+        } else {
+          // Print an error message
+          std::cout << "Invalid publish date: " << publishdate << "\n";
         }
-        break;
       }
+      break;
     }
   }
-};
+}
 
 // Function to prompt the user to enter details of books, add them to a BookList
 // object, and write it to a CSV file
