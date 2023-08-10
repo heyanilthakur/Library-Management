@@ -1,34 +1,31 @@
-#include "BorrowerDef.h"
-#include "LibrarianDef.h" // Include the header file that defines the Librarian class and its methods
-#include "date.h" // Include the header file that defines the Date class and its methods
+#include "LibrarianDef.h"
+#include "date.h"
 #include <fstream>
 #include <iostream>
 #include <list>
 #include <string>
 using namespace std;
-// Method to add a new book at the end of the list
+
 void BookList::addBook(string serial, string bookname, string author,
                        string publishdate) {
-  // Create a new book with the given data
+
   Book newBook = {serial, bookname, author, publishdate, "",
                   "",     "",       true,   "Available"};
-  // Add the new book to the end of the list
+
   books.push_back(newBook);
 }
 
-// Method to delete a book from the list based on its serial number
 void BookList::deleteBook(string serial) {
-  // Find the book with the given serial number
+
   for (auto it = books.begin(); it != books.end(); ++it) {
     if (it->serial == serial) {
-      // Delete the book from the list
+
       books.erase(it);
       break;
     }
   }
 }
 
-// Method to write the list to a file
 void BookList::writeToFile(string filename) {
   fstream outFile(filename, ios::out);
   if (outFile.is_open()) {
@@ -47,10 +44,10 @@ void BookList::writeToFile(string filename) {
 
 void BookList::modifyBook(string serial, string bookname, string author,
                           string publishdate) {
-  // Find the book with the given serial number
+
   for (auto &book : books) {
     if (book.serial == serial) {
-      // Modify the book's data if new data is provided
+
       if (!bookname.empty()) {
         book.bookname = bookname;
       }
@@ -58,11 +55,11 @@ void BookList::modifyBook(string serial, string bookname, string author,
         book.author = author;
       }
       if (!publishdate.empty()) {
-        // Check if the publishdate is valid
+
         if (isValidDate(publishdate)) {
           book.publishdate = publishdate;
         } else {
-          // Print an error message
+
           std::cout << "Invalid publish date: " << publishdate << "\n";
         }
       }
@@ -90,7 +87,6 @@ void BookList::returnBook(string serial) {
     if (book.serial == serial && !book.borrowerID.empty() && !book.returned) {
       book.returned = true;
 
-      // Calculate fine if the return is after the due date
       if (isValidDate(book.dueDate)) {
         time_t now = time(nullptr);
         tm dueTm = {};
@@ -101,13 +97,12 @@ void BookList::returnBook(string serial) {
         double daysLate = secondsLate / (60 * 60 * 24);
 
         if (daysLate > 0) {
-          double finePerDay = 5.0; // Adjust the fine per day as needed
+          double finePerDay = 5.0;
           double fineAmount = daysLate * finePerDay;
           cout << "Fine calculated: Rs." << fineAmount << endl;
         }
       }
 
-      // Update the book status
       book.status = "Available";
       book.borrowerID = "";
       book.borrowDate = "";
@@ -142,33 +137,15 @@ void BookList::listBorrowedBooksByBorrowerID(string borrowerID) {
     cout << "No borrowed books found for Borrower ID " << borrowerID << endl;
   }
 }
-void BorrowerList::writeToFile(std::string filename) {
-  std::ofstream outFile(filename);
-  if (outFile.is_open()) {
-    for (const Borrower &borrower : borrowers) {
-      outFile << borrower.borrowerID << "," << borrower.name << ","
-              << borrower.contact << "\n";
-    }
-    outFile.close();
-    std::cout << "Borrower data written to file: " << filename << std::endl;
-  } else {
-    std::cerr << "Unable to open file: " << filename << std::endl;
-  }
-}
-
-// Function to prompt the user to enter details of books, add them to a BookList
-// object, and write it to a CSV file
 void addBooks(BookList &books) {
   string serial, bookname, author, publishdate;
 
   cout << "Enter the following details: " << endl;
 
-  // Loop until the user enters 'q' to quit
   while (true) {
     cout << "BOOK SERIAL (enter 'q' to quit): ";
     getline(cin, serial);
 
-    // Break out of the loop if 'q' is entered
     if (serial == "q")
       break;
 
@@ -181,7 +158,6 @@ void addBooks(BookList &books) {
     cout << "PUBLISH DATE(DD MM YYYY): ";
     getline(cin, publishdate);
 
-    // Add a new book to the list with the given data
     if (isValidDate(publishdate)) {
       books.addBook(serial, bookname, author, publishdate);
     } else {
@@ -189,14 +165,11 @@ void addBooks(BookList &books) {
     }
   }
 
-  // Write the updated book list to a file
   books.writeToFile(
       "/Users/AN20449220/Desktop/Library-Management/csv/data.csv");
   cout << "Books added successfully!" << endl;
 }
 
-// Function to prompt the user to enter the serial number of a book and delete
-// it from a BookList object
 void deleteBook(BookList &books) {
   string serial;
 
@@ -205,7 +178,6 @@ void deleteBook(BookList &books) {
   cout << "BOOK SERIAL: ";
   getline(cin, serial);
 
-  // Delete the book with the given serial number from the list
   books.deleteBook(serial);
   books.writeToFile(
       "/Users/AN20449220/Desktop/Library-Management/csv/data.csv");
@@ -227,12 +199,11 @@ void modifyBooks(BookList &books) {
   std::cout << "NEW PUBLISH DATE: ";
   getline(std::cin, publishdate);
 
-  // Modify the book with the given serial number in the list
   books.modifyBook(serial, bookname, author, publishdate);
   books.writeToFile(
       "/Users/AN20449220/Desktop/Library-Management/csv/data.csv");
 }
-// Function to prompt the user to enter details of borrowing a book
+
 void borrowBooks(BookList &books) {
   string serial, borrowerID, borrowDate, dueDate;
 
@@ -250,7 +221,6 @@ void borrowBooks(BookList &books) {
   cout << "DUE DATE(DD MM YYYY): ";
   getline(cin, dueDate);
 
-  // Call the borrowBook function using the books object
   if (isValidDate(borrowDate) && isValidDate(dueDate)) {
     books.borrowBook(serial, borrowerID, borrowDate, dueDate);
   } else {
@@ -270,7 +240,6 @@ void returnBooks(BookList &books) {
   cout << "BOOK SERIAL: ";
   getline(cin, serial);
 
-  // Call the returnBook function using the books object
   books.returnBook(serial);
   books.writeToFile(
       "/Users/AN20449220/Desktop/Library-Management/csv/data.csv");
@@ -285,9 +254,8 @@ void listBorrowedBooksByBorrowerIDs(BookList &books) {
 }
 
 BookList books;
-BorrowerList borrowers;
 void LibraryLogin() {
-  // Create an object of BookList class
+
   string userid, password, domain;
   cout << "Enter Your Name: ";
   cin >> userid;
@@ -366,10 +334,10 @@ void LibraryLogin() {
         modifyBooks(books);
         break;
       case 4:
-        // addBorrowers(borrowers);
+
         break;
       case 5:
-        // deleteBorrower(borrowers);
+
         break;
       case 6:
         listBorrowedBooksByBorrowerIDs(books);
@@ -394,7 +362,7 @@ void LibraryLogin() {
       cin.ignore();
 
       if (continueChoice != 'y' && continueChoice != 'Y') {
-        break; // Exit the loop if the user doesn't want to continue
+        break;
       }
     } while (true);
   }
