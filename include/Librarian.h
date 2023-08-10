@@ -142,35 +142,6 @@ void BookList::listBorrowedBooksByBorrowerID(string borrowerID) {
     cout << "No borrowed books found for Borrower ID " << borrowerID << endl;
   }
 }
-
-// void BorrowerList::addBorrower(string borrowerID, string name, string contact) {
-//   Borrower newBorrower = {borrowerID, name, contact};
-//   borrowers.push_back(newBorrower);
-// }
-
-// void BorrowerList::deleteBorrower(string borrowerID) {
-//   for (auto it = borrowers.begin(); it != borrowers.end(); ++it) {
-//     if (it->borrowerID == borrowerID) {
-//       borrowers.erase(it);
-//       break;
-//     }
-//   }
-// }
-
-// void BorrowerList::modifyBorrower(string borrowerID, string name,
-//                                   string contact) {
-//   for (auto &borrower : borrowers) {
-//     if (borrower.borrowerID == borrowerID) {
-//       if (!name.empty()) {
-//         borrower.name = name;
-//       }
-//       if (!contact.empty()) {
-//         borrower.contact = contact;
-//       }
-//       break;
-//     }
-//   }
-// }
 void BorrowerList::writeToFile(std::string filename) {
   std::ofstream outFile(filename);
   if (outFile.is_open()) {
@@ -261,64 +232,6 @@ void modifyBooks(BookList &books) {
   books.writeToFile(
       "/Users/AN20449220/Desktop/Library-Management/csv/data.csv");
 }
-
-// void addBorrowers(BorrowerList &borrowers) {
-//   string borrowerID, name, contact;
-
-//   cout << "Enter the following details: " << endl;
-
-//   while (true) {
-//     cout << "BORROWER ID (enter 'q' to quit): ";
-//     getline(cin, borrowerID);
-
-//     if (borrowerID == "q")
-//       break;
-
-//     cout << "BORROWER NAME: ";
-//     getline(cin, name);
-
-//     cout << "BORROWER CONTACT: ";
-//     getline(cin, contact);
-
-//     borrowers.addBorrower(borrowerID, name, contact);
-//   }
-//   borrowers.writeToFile(
-//       "/Users/AN20449220/Desktop/Library-Management/csv/borrowers.csv");
-// }
-
-// void deleteBorrower(BorrowerList &borrowers) {
-//   string borrowerID;
-
-//   cout << "Enter the following details: " << endl;
-
-//   cout << "BORROWER ID: ";
-//   getline(cin, borrowerID);
-
-//   borrowers.deleteBorrower(borrowerID);
-
-//   borrowers.writeToFile(
-//       "/Users/AN20449220/Desktop/Library-Management/csv/borrowers.csv");
-// }
-
-// void modifyBorrowers(BorrowerList &borrowers) {
-//   string borrowerID, name, contact;
-
-//   cout << "Enter the following details: " << endl;
-
-//   cout << "BORROWER ID: ";
-//   getline(cin, borrowerID);
-
-//   cout << "NEW BORROWER NAME: ";
-//   getline(cin, name);
-
-//   cout << "NEW BORROWER CONTACT: ";
-//   getline(cin, contact);
-
-//   borrowers.modifyBorrower(borrowerID, name, contact);
-
-//   borrowers.writeToFile(
-//       "/Users/AN20449220/Desktop/Library-Management/csv/borrowers.csv");
-// }
 // Function to prompt the user to enter details of borrowing a book
 void borrowBooks(BookList &books) {
   string serial, borrowerID, borrowDate, dueDate;
@@ -453,10 +366,10 @@ void LibraryLogin() {
         modifyBooks(books);
         break;
       case 4:
-        //addBorrowers(borrowers);
+        // addBorrowers(borrowers);
         break;
       case 5:
-        //deleteBorrower(borrowers);
+        // deleteBorrower(borrowers);
         break;
       case 6:
         listBorrowedBooksByBorrowerIDs(books);
