@@ -5,10 +5,15 @@ using namespace std;
 
 // Define a struct for a book
 struct Book {
-  std::string serial;
-  std::string bookname;
-  std::string author;
-  std::string publishdate;
+  string serial;
+  string bookname;
+  string author;
+  string publishdate;
+  string borrowerID;
+  string borrowDate;
+  string dueDate;
+  bool returned;
+  string status;
 };
 
 // Define a class for a list of books using STL list
@@ -30,4 +35,8 @@ public:
   // Method to modify a book's data based on its serial number
   void modifyBook(string serial, string bookname = "", string author = "",
                   string publishdate = "");
+
+  void borrowBook(string serial, string borrowerID, string borrowDate,
+                  string dueDate);
+  void returnBook(string serial);
 };
