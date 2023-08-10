@@ -29,6 +29,8 @@ public:
   // Method to delete a book from the list based on its serial number
   void deleteBook(string serial);
 
+  void listBorrowedBooksByBorrowerID(string borrowerID);
+
   // Method to write the list to a file
   void writeToFile(string filename);
 

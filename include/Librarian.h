@@ -10,16 +10,10 @@ using namespace std;
 void BookList::addBook(string serial, string bookname, string author,
                        string publishdate) {
   // Create a new book with the given data
-  if (isValidDate(publishdate)) {
-
-    Book newBook = {serial, bookname, author, publishdate, "",
-                    "",     "",       true,   "Available"};
-
-    // Add the new book to the end of the list
-    books.push_back(newBook);
-  } else {
-    cout << "Invalid publish date: " << publishdate << "\n";
-  }
+  Book newBook = {serial, bookname, author, publishdate, "",
+                  "",     "",       true,   "Available"};
+  // Add the new book to the end of the list
+  books.push_back(newBook);
 }
 
 // Method to delete a book from the list based on its serial number
@@ -94,45 +88,89 @@ void BookList::borrowBook(string serial, string borrowerID, string borrowDate,
 void BookList::returnBook(string serial) {
   for (auto &book : books) {
     if (book.serial == serial && !book.borrowerID.empty() && !book.returned) {
+      book.returned = true;
+
+      // Calculate fine if the return is after the due date
+      if (isValidDate(book.dueDate)) {
+        time_t now = time(nullptr);
+        tm dueTm = {};
+        istringstream(book.dueDate) >> get_time(&dueTm, "%Y-%m-%d");
+        time_t dueTime = mktime(&dueTm);
+
+        double secondsLate = difftime(now, dueTime);
+        double daysLate = secondsLate / (60 * 60 * 24);
+
+        if (daysLate > 0) {
+          double finePerDay = 5.0; // Adjust the fine per day as needed
+          double fineAmount = daysLate * finePerDay;
+          cout << "Fine calculated: Rs." << fineAmount << endl;
+        }
+      }
+
+      // Update the book status
+      book.status = "Available";
       book.borrowerID = "";
       book.borrowDate = "";
       book.dueDate = "";
-      book.returned = true;
-      book.status = "Available";
+
       cout << "Book returned successfully!" << endl;
       return;
     }
   }
   cout << "Book not available for returning." << endl;
 }
-void BorrowerList::addBorrower(string borrowerID, string name, string contact) {
-  Borrower newBorrower = {borrowerID, name, contact};
-  borrowers.push_back(newBorrower);
-}
+void BookList::listBorrowedBooksByBorrowerID(string borrowerID) {
+  bool found = false;
 
-void BorrowerList::deleteBorrower(string borrowerID) {
-  for (auto it = borrowers.begin(); it != borrowers.end(); ++it) {
-    if (it->borrowerID == borrowerID) {
-      borrowers.erase(it);
-      break;
+  cout << "Books borrowed by Borrower ID " << borrowerID << ":" << endl;
+
+  for (const auto &book : books) {
+    if (book.borrowerID == borrowerID && !book.returned) {
+      found = true;
+      cout << "Serial: " << book.serial << endl;
+      cout << "Book Name: " << book.bookname << endl;
+      cout << "Author: " << book.author << endl;
+      cout << "Publish Date: " << book.publishdate << endl;
+      cout << "Borrow Date: " << book.borrowDate << endl;
+      cout << "Due Date: " << book.dueDate << endl;
+      cout << "Status: " << book.status << endl;
+      cout << "-------------------------------" << endl;
     }
+  }
+
+  if (!found) {
+    cout << "No borrowed books found for Borrower ID " << borrowerID << endl;
   }
 }
 
-void BorrowerList::modifyBorrower(string borrowerID, string name,
-                                  string contact) {
-  for (auto &borrower : borrowers) {
-    if (borrower.borrowerID == borrowerID) {
-      if (!name.empty()) {
-        borrower.name = name;
-      }
-      if (!contact.empty()) {
-        borrower.contact = contact;
-      }
-      break;
-    }
-  }
-}
+// void BorrowerList::addBorrower(string borrowerID, string name, string contact) {
+//   Borrower newBorrower = {borrowerID, name, contact};
+//   borrowers.push_back(newBorrower);
+// }
+
+// void BorrowerList::deleteBorrower(string borrowerID) {
+//   for (auto it = borrowers.begin(); it != borrowers.end(); ++it) {
+//     if (it->borrowerID == borrowerID) {
+//       borrowers.erase(it);
+//       break;
+//     }
+//   }
+// }
+
+// void BorrowerList::modifyBorrower(string borrowerID, string name,
+//                                   string contact) {
+//   for (auto &borrower : borrowers) {
+//     if (borrower.borrowerID == borrowerID) {
+//       if (!name.empty()) {
+//         borrower.name = name;
+//       }
+//       if (!contact.empty()) {
+//         borrower.contact = contact;
+//       }
+//       break;
+//     }
+//   }
+// }
 void BorrowerList::writeToFile(std::string filename) {
   std::ofstream outFile(filename);
   if (outFile.is_open()) {
@@ -173,10 +211,17 @@ void addBooks(BookList &books) {
     getline(cin, publishdate);
 
     // Add a new book to the list with the given data
-    books.addBook(serial, bookname, author, publishdate);
+    if (isValidDate(publishdate)) {
+      books.addBook(serial, bookname, author, publishdate);
+    } else {
+      cout << "Invalid publish date format." << endl;
+    }
   }
+
+  // Write the updated book list to a file
   books.writeToFile(
       "/Users/AN20449220/Desktop/Library-Management/csv/data.csv");
+  cout << "Books added successfully!" << endl;
 }
 
 // Function to prompt the user to enter the serial number of a book and delete
@@ -217,63 +262,63 @@ void modifyBooks(BookList &books) {
       "/Users/AN20449220/Desktop/Library-Management/csv/data.csv");
 }
 
-void addBorrowers(BorrowerList &borrowers) {
-  string borrowerID, name, contact;
+// void addBorrowers(BorrowerList &borrowers) {
+//   string borrowerID, name, contact;
 
-  cout << "Enter the following details: " << endl;
+//   cout << "Enter the following details: " << endl;
 
-  while (true) {
-    cout << "BORROWER ID (enter 'q' to quit): ";
-    getline(cin, borrowerID);
+//   while (true) {
+//     cout << "BORROWER ID (enter 'q' to quit): ";
+//     getline(cin, borrowerID);
 
-    if (borrowerID == "q")
-      break;
+//     if (borrowerID == "q")
+//       break;
 
-    cout << "BORROWER NAME: ";
-    getline(cin, name);
+//     cout << "BORROWER NAME: ";
+//     getline(cin, name);
 
-    cout << "BORROWER CONTACT: ";
-    getline(cin, contact);
+//     cout << "BORROWER CONTACT: ";
+//     getline(cin, contact);
 
-    borrowers.addBorrower(borrowerID, name, contact);
-  }
-  borrowers.writeToFile(
-      "/Users/AN20449220/Desktop/Library-Management/csv/borrowers.csv");
-}
+//     borrowers.addBorrower(borrowerID, name, contact);
+//   }
+//   borrowers.writeToFile(
+//       "/Users/AN20449220/Desktop/Library-Management/csv/borrowers.csv");
+// }
 
-void deleteBorrower(BorrowerList &borrowers) {
-  string borrowerID;
+// void deleteBorrower(BorrowerList &borrowers) {
+//   string borrowerID;
 
-  cout << "Enter the following details: " << endl;
+//   cout << "Enter the following details: " << endl;
 
-  cout << "BORROWER ID: ";
-  getline(cin, borrowerID);
+//   cout << "BORROWER ID: ";
+//   getline(cin, borrowerID);
 
-  borrowers.deleteBorrower(borrowerID);
+//   borrowers.deleteBorrower(borrowerID);
 
-  borrowers.writeToFile(
-      "/Users/AN20449220/Desktop/Library-Management/csv/borrowers.csv");
-}
+//   borrowers.writeToFile(
+//       "/Users/AN20449220/Desktop/Library-Management/csv/borrowers.csv");
+// }
 
-void modifyBorrowers(BorrowerList &borrowers) {
-  string borrowerID, name, contact;
+// void modifyBorrowers(BorrowerList &borrowers) {
+//   string borrowerID, name, contact;
 
-  cout << "Enter the following details: " << endl;
+//   cout << "Enter the following details: " << endl;
 
-  cout << "BORROWER ID: ";
-  getline(cin, borrowerID);
+//   cout << "BORROWER ID: ";
+//   getline(cin, borrowerID);
 
-  cout << "NEW BORROWER NAME: ";
-  getline(cin, name);
+//   cout << "NEW BORROWER NAME: ";
+//   getline(cin, name);
 
-  cout << "NEW BORROWER CONTACT: ";
-  getline(cin, contact);
+//   cout << "NEW BORROWER CONTACT: ";
+//   getline(cin, contact);
 
-  borrowers.modifyBorrower(borrowerID, name, contact);
+//   borrowers.modifyBorrower(borrowerID, name, contact);
 
-  borrowers.writeToFile(
-      "/Users/AN20449220/Desktop/Library-Management/csv/borrowers.csv");
-}
+//   borrowers.writeToFile(
+//       "/Users/AN20449220/Desktop/Library-Management/csv/borrowers.csv");
+// }
 // Function to prompt the user to enter details of borrowing a book
 void borrowBooks(BookList &books) {
   string serial, borrowerID, borrowDate, dueDate;
@@ -293,7 +338,13 @@ void borrowBooks(BookList &books) {
   getline(cin, dueDate);
 
   // Call the borrowBook function using the books object
-  books.borrowBook(serial, borrowerID, borrowDate, dueDate);
+  if (isValidDate(borrowDate) && isValidDate(dueDate)) {
+    books.borrowBook(serial, borrowerID, borrowDate, dueDate);
+  } else {
+    cout << "Invalid date format." << endl;
+  }
+
+  cout << "Book borrowed successfully!" << endl;
   books.writeToFile(
       "/Users/AN20449220/Desktop/Library-Management/csv/data.csv");
 }
@@ -310,6 +361,14 @@ void returnBooks(BookList &books) {
   books.returnBook(serial);
   books.writeToFile(
       "/Users/AN20449220/Desktop/Library-Management/csv/data.csv");
+}
+void listBorrowedBooksByBorrowerIDs(BookList &books) {
+  string borrowerID;
+
+  cout << "Enter the borrower ID to list borrowed books: ";
+  getline(cin, borrowerID);
+
+  books.listBorrowedBooksByBorrowerID(borrowerID);
 }
 
 BookList books;
@@ -373,9 +432,9 @@ void LibraryLogin() {
            << endl;
       cout << "|               7. Borrow Boook from Library :         |"
            << endl;
-      cout << "|               6. Return Book from Library :          |"
+      cout << "|               8. Return Book from Library :          |"
            << endl;
-      cout << "|               7. Exit :                              |"
+      cout << "|               9. Exit :                              |"
            << endl;
       cout << "-------------------------------------------------------" << endl;
 
@@ -394,13 +453,13 @@ void LibraryLogin() {
         modifyBooks(books);
         break;
       case 4:
-        addBorrowers(borrowers);
+        //addBorrowers(borrowers);
         break;
       case 5:
-        deleteBorrower(borrowers);
+        //deleteBorrower(borrowers);
         break;
       case 6:
-        modifyBorrowers(borrowers);
+        listBorrowedBooksByBorrowerIDs(books);
         break;
       case 7:
         borrowBooks(books);
@@ -416,6 +475,14 @@ void LibraryLogin() {
         cout << "Invalid Choice! Try Again." << endl;
         break;
       }
-    } while (choice != 7);
+      char continueChoice;
+      cout << "Do you want to continue (y/n)? ";
+      cin >> continueChoice;
+      cin.ignore();
+
+      if (continueChoice != 'y' && continueChoice != 'Y') {
+        break; // Exit the loop if the user doesn't want to continue
+      }
+    } while (true);
   }
 }
