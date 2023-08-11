@@ -149,7 +149,7 @@ void listBorrowedBooksByBorrowerIDs(BookList &books) {
 BookList books;
 void LibraryLogin() {
 
-  string userid, password, domain;
+  string userid, password;
   cout << "Enter Your Name: ";
   cin >> userid;
   cout << "Enter your Password: ";
