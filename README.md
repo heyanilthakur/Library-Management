@@ -21,6 +21,10 @@ The Library Management System is a C++ project that aims to provide an efficient
 - Borrow books from the library.
 - Return borrowed books to the library.
 
+## Medium Article
+
+I've written an article about this project on Medium. You can read it [here](https://medium.com/@heyanilthakur/building-a-library-management-system-in-c-8bc0ff501a6e).
+
 ## Getting Started
 
 1. Clone the repository to your local machine:
